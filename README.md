@@ -5,4 +5,4 @@
 - [] Press-Resize-button
 - [] Export-the-skinned-file-into-fbx.
 - [] Import-it-in-Unity
-[^1] Enjoy it !
+[^1]: Enjoy it !
