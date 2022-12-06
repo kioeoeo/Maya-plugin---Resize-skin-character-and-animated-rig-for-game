@@ -3,5 +3,6 @@
 - [] Run-the-script-in-maya
 - [] Change-the-Scale-Size-in-"Joint-Scale"-UI
 - [] Press-Resize-button
-: Export-the-skinned-file-into-fbx.
+- [] Export-the-skinned-file-into-fbx.
 - [] Import-it-in-Unity
+[^1] Enjoy it !
