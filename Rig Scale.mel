@@ -1,0 +1,124 @@
+///////JointScaleTool- For game///////
+////AUTHOR : Rice Wang
+////CopyRight (C) 2022 Great Rigger Ltd. - Rice Wang
+////Create date :   05/Dec/2022 //////
+////Discription: run the whole script and change the scale size
+
+
+string $animaRigScale = "animaRigScale";
+if (`window -exists $animaRigScale`) deleteUI -window $animaRigScale;
+window -title "Joint Scale" -menuBar true -minimizeButton false -maximizeButton false -rtf true -wh 180 100 $animaRigScale;
+ 
+columnLayout -adjustableColumn true -cal "left" ColumnLayout;
+
+//scale Checkboxes
+checkBox -label "Scale X" -cc "unCheck(\"sc\")" scX;
+checkBox -label "Scale Y" -cc "unCheck(\"sc\")" scY;
+checkBox -label "Scale Z" -cc "unCheck(\"sc\")" scZ;
+separator -height 2 -st none;
+checkBox -label "All Scales" -cc "SelectAllScs()" allScs;
+
+rowColumnLayout -adj true -nc 2;
+    text -label "Scale Size" -al "left" -w 10;
+    floatField -en true -min 0.2 -max 4 -v 1 -pre 2 -s 0.1 scNumber;
+separator -height 2 -st "none";
+
+separator -h 5 -st "none" ;
+//rowColumnLayout -nc 1 -h 250;
+columnLayout -adjustableColumn true -cal "right" ColumnLayout;
+button -l "Resize" -w 55 -h 25 -c "ScaleRig()";
+
+showWindow $animaRigScale; 
+
+//Turns the select all scales checkbox on or off
+////////////////
+proc SelectAllScs()
+{
+    string $selectAllScs = `checkBox -q -value allScs`;
+    if ($selectAllScs)
+    {
+        checkBox -e -v true scX;
+        checkBox -e -v true scY;
+        checkBox -e -v true scZ;              
+    }
+    else
+    {
+        checkBox -e -v false scX;
+        checkBox -e -v false scY;
+        checkBox -e -v false scZ;
+    }
+}
+///checkbox function// Uncheck function
+
+proc unCheck(string $checkBoxes)
+{
+string $scX = `checkBox -q -value scX`;
+string $scY = `checkBox -q -value scY`;
+string $scZ = `checkBox -q -value scZ`;
+
+switch ($checkBoxes) 
+{
+    case "sc":
+        if (($scX == 0) || ($scY == 0) || ($scZ == 0))
+        {
+            checkBox -e -v false allScs;
+        }
+        if ($scX && $scY && $scZ)
+            checkBox -e -v true allScs;
+}
+}
+
+proc ScaleRig(){
+    
+    SelectAllJoints;
+    string $ChildJoints[] = `listRelatives -c`;
+    string $PickJnts[] = `select $ChildJoints`;
+    string $RestJoints[] = `listRelatives -c`;
+    string $SpineJoints[] = `select -d $RestJoints`;
+    string $SelJoint[] = `ls -sl -type joint`;
+    setAttr ($SelJoint[0] + ".segmentScaleCompensate")0;
+    
+    SelectAllJoints;                    ///Get the root joint attribute ///
+    string $ResizeJoint[] = `select -d $ChildJoints`;
+    string $Root[] = `ls -sl -type joint`;
+
+    int $Firstfps = `findKeyframe -ts -w first`;     ///get the key animaiton range ///
+    int $Lastfps = `findKeyframe -ts -w last`;
+    string $range = ($Firstfps +":"+$Lastfps);
+    float $value = `floatField -q -v scNumber`;      ///execute the scale size to all joints ////
+       
+    string $scX = `checkBox -q -value scX`;          ///connect to the checkboxes UI ////
+    string $scY = `checkBox -q -value scY`;
+    string $scZ = `checkBox -q -value scZ`; 
+        if ($scX == 1){
+            int $key = `keyframe -at "scaleX" -q -kc $Root`;
+            if ($key > 0)
+                keyframe -at scaleX -t $range -vc $value $Root;
+            else
+                setKeyframe -at scaleX -v $value;
+                cutKey -at scaleX -t $range;            
+        }
+        if ($scY == 1){
+            int $key = `keyframe -at "scaleY" -q -kc $Root`;
+            if ($key > 0)
+                keyframe -at scaleY -t $range -vc $value $Root;
+            else
+                setKeyframe -at scaleY -v $value;
+                cutKey -at scaleY -t $range;
+        }
+        if ($scZ == 1){
+            int $key =`keyframe -at "scaleZ" -q -kc $Root`;
+            if ($key > 0)
+                keyframe -at scaleZ -t $range -vc $value $Root;
+            else
+                setKeyframe -at scaleZ -v $value;
+                cutKey -at scaleZ -t $range;
+        }
+}
+
+
+
+
+
+
+
